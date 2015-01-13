@@ -2,7 +2,6 @@ package com.baoyz.dribble;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 
 import com.baoyz.dribble.fragment.FeedFragment;
 
@@ -16,18 +15,14 @@ public class MainActivity extends MaterialNavigationDrawer implements MaterialAc
     @Override
     public void init(Bundle bundle) {
 
-        // add first account
-        MaterialAccount account = new MaterialAccount(getResources(), "NeoKree", "neokree@gmail.com", R.drawable.ic_launcher, R.drawable.mat3);
+        MaterialAccount account = new MaterialAccount(getResources(), "Baoyz", "baoyz94@gmail.com", R.drawable.avatar, R.drawable.mat3);
         this.addAccount(account);
 
-        // set listener
         this.setAccountListener(this);
 
-        // create sections
-        Intent i = new Intent(this, ContactsContract.Profile.class);
+        Intent i = new Intent(this, SettingsActivity.class);
         MaterialSection settingsSection = this.newSection("Settings", this.getResources().getDrawable(R.drawable.ic_settings_black_48dp), i);
 
-        // add your sections to the drawer
         this.addSection(newSection("Popular", FeedFragment.newInstance("")));
         this.addSection(newSection("Animated", FeedFragment.newInstance("animated")));
         this.addSection(newSection("Debuts", FeedFragment.newInstance("debuts")));

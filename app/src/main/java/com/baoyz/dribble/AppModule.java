@@ -41,7 +41,6 @@ import timber.log.Timber;
 @Module(
         injects = {
                 FeedFragment.class,
-                MainActivity2.class,
         }
 )
 public class AppModule {
