@@ -23,6 +23,7 @@
  */
 package com.baoyz.dribble;
 
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -50,6 +51,8 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
         this.mList = list;
     }
 
+    private int lastIndex = -1;
+
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_feed, parent, false));
@@ -66,6 +69,15 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
         holder.mTvFavorite.setText(shot.getLikes_count().toString());
         holder.mTvViews.setText(shot.getViews_count().toString());
         picasso.load(shot.getImages().getHidpi()).into(holder.mIvImage);
+
+
+        if (position > lastIndex) {
+            lastIndex = position;
+            // 开启动画
+            holder.cardView.setTranslationY(300);
+            holder.cardView.setRotationX(30);
+            holder.cardView.animate().translationY(0).rotationX(0).setDuration(500).start();
+        }
     }
 
     @Override
@@ -75,6 +87,8 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
+        @InjectView(R.id.card_view)
+        CardView cardView;
         @InjectView(R.id.iv_avatar)
         CircleImageView mIvAvatar;
         @InjectView(R.id.tv_username)

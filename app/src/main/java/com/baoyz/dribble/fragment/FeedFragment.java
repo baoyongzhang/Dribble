@@ -45,9 +45,11 @@ import java.util.List;
 import javax.inject.Inject;
 
 import butterknife.InjectView;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import jp.wasabeef.recyclerview.animators.LandingAnimator;
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by baoyz on 15/1/12.
@@ -95,19 +97,37 @@ public class FeedFragment extends BaseFragment {
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mFeedList.setLayoutManager(layoutManager);
         mFeedList.setOnScrollListener(new ToolBarScrollListener(mActivity.getToolbar()));
+        mFeedList.setItemAnimator(new LandingAnimator());
 
-        mClient.shots(mList, 1, new Callback<List<Shot>>() {
+        Observable<List<Shot>> o = mClient.shots(mList, 1);
+        o.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<List<Shot>>() {
             @Override
-            public void success(List<Shot> shots, Response response) {
-                mFeedList.setAdapter(new FeedAdapter(shots));
+            public void onCompleted() {
                 mProgressBar.setVisibility(View.GONE);
             }
 
             @Override
-            public void failure(RetrofitError error) {
-                error.printStackTrace();
+            public void onError(Throwable throwable) {
+//                throwable.printStackTrace();
+            }
+
+            @Override
+            public void onNext(List<Shot> shots) {
+                mFeedList.setAdapter(new FeedAdapter(shots));
             }
         });
+//        mClient.shots(mList, 1, new Callback<List<Shot>>() {
+//            @Override
+//            public void success(List<Shot> shots, Response response) {
+//                mFeedList.setAdapter(new FeedAdapter(shots));
+//                mProgressBar.setVisibility(View.GONE);
+//            }
+//
+//            @Override
+//            public void failure(RetrofitError error) {
+//                error.printStackTrace();
+//            }
+//        });
     }
 
     static class ToolBarScrollListener extends RecyclerView.OnScrollListener {

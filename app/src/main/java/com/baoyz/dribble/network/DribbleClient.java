@@ -31,6 +31,7 @@ import retrofit.Callback;
 import retrofit.http.GET;
 import retrofit.http.Path;
 import retrofit.http.Query;
+import rx.Observable;
 
 /**
  * Created by baoyz on 15/1/10.
@@ -40,7 +41,7 @@ public interface DribbleClient {
     public static final String END_POINT = "https://api.dribbble.com/v1";
 
     @GET("/shots")
-    public void shots(@Query("list") String list, @Query("page") Integer page, Callback<List<Shot>> callback);
+    public Observable<List<Shot>> shots(@Query("list") String list, @Query("page") Integer page);
 
     @GET("/shots/{id}/attachments")
     public void attachments(@Path("id") String shotId, Callback callback);

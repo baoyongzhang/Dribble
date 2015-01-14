@@ -40,4 +40,6 @@ dependencies {
     compile 'com.squareup.picasso:picasso:2.4.0'
     compile 'com.squareup.dagger:dagger:1.2.2'
     compile 'com.github.navasmdc:MaterialDesign:1.+@aar'
+    compile 'com.netflix.rxjava:rxjava-android:0.20.7'
+    compile 'jp.wasabeef:recyclerview-animators:1.0.1'
 }
