@@ -25,6 +25,8 @@ package com.baoyz.dribble;
 
 import android.app.Application;
 
+import com.squareup.picasso.Picasso;
+
 import timber.log.Timber;
 
 /**
@@ -32,9 +34,19 @@ import timber.log.Timber;
  */
 public class App extends Application {
 
+    public static App instance;
+
+    public static App getInstance() {
+        return instance;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
+
+        instance = this;
+
+        Picasso.with(this).setIndicatorsEnabled(BuildConfig.DEBUG);
 
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());

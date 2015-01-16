@@ -27,25 +27,22 @@ import com.baoyz.dribble.model.Shot;
 
 import java.util.List;
 
-import rx.Observer;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import retrofit.Callback;
+import retrofit.http.GET;
+import retrofit.http.Path;
+import retrofit.http.Query;
+import rx.Observable;
 
 /**
  * Created by baoyz on 15/1/10.
  */
-public class DribbleClient {
+public interface DribbleApi {
 
     public static final String END_POINT = "https://api.dribbble.com/v1";
 
-    private DribbleApi mApi;
+    @GET("/shots")
+    public Observable<List<Shot>> shots(@Query("list") String list, @Query("page") Integer page);
 
-    public DribbleClient(DribbleApi mApi) {
-        this.mApi = mApi;
-    }
-
-    public Subscription shots(String list, Integer page, Observer<List<Shot>> observer) {
-        return mApi.shots(list, page).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(observer);
-    }
+    @GET("/shots/{id}/attachments")
+    public void attachments(@Path("id") String shotId, Callback callback);
 }

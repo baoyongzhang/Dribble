@@ -23,8 +23,20 @@
  */
 package com.baoyz.dribble;
 
+import android.app.Application;
+import android.net.Uri;
+
+import com.baoyz.dribble.adapter.FeedAdapter;
 import com.baoyz.dribble.fragment.FeedFragment;
+import com.baoyz.dribble.network.DribbleApi;
 import com.baoyz.dribble.network.DribbleClient;
+import com.squareup.okhttp.Cache;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.picasso.OkHttpDownloader;
+import com.squareup.picasso.Picasso;
+
+import java.io.File;
+import java.io.IOException;
 
 import javax.inject.Singleton;
 
@@ -41,14 +53,44 @@ import timber.log.Timber;
 @Module(
         injects = {
                 FeedFragment.class,
+                FeedAdapter.class,
         }
 )
 public class AppModule {
 
+    static final int DISK_CACHE_SIZE = 50 * 1024 * 1024; // 50MB
+
+    @Provides
+    @Singleton
+    Application provideApplication() {
+        return App.getInstance();
+    }
+
+    @Provides
+    @Singleton
+    public OkHttpClient provideOkHttpClient(Application app) {
+        return createOkHttpClient(app);
+    }
+
+    @Provides
+    @Singleton
+    public Picasso providePicasso(Application app, OkHttpClient client) {
+        return new Picasso.Builder(app)
+                .indicatorsEnabled(BuildConfig.DEBUG)
+                .downloader(new OkHttpDownloader(client))
+                .listener(new Picasso.Listener() {
+                    @Override
+                    public void onImageLoadFailed(Picasso picasso, Uri uri, Exception e) {
+                        Timber.e(e, "Failed to load image: %s", uri);
+                    }
+                })
+                .build();
+    }
+
     @Provides
     @Singleton
     public DribbleClient provideDribbleClient(RestAdapter adapter) {
-        return adapter.create(DribbleClient.class);
+        return new DribbleClient(adapter.create(DribbleApi.class));
     }
 
     @Provides
@@ -69,7 +111,21 @@ public class AppModule {
                 }).build();
     }
 
-    public static void inject(Object target){
+    public static void inject(Object target) {
         ObjectGraph.create(AppModule.class).inject(target);
+    }
+
+    static OkHttpClient createOkHttpClient(Application app) {
+        OkHttpClient client = new OkHttpClient();
+
+        try {
+            File cacheDir = new File(app.getCacheDir(), "http");
+            Cache cache = new Cache(cacheDir, DISK_CACHE_SIZE);
+            client.setCache(cache);
+        } catch (IOException e) {
+            Timber.e(e, "Unable to install disk cache.");
+        }
+
+        return client;
     }
 }

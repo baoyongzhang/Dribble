@@ -21,31 +21,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.baoyz.dribble.network;
+package com.baoyz.dribble.adapter;
 
-import com.baoyz.dribble.model.Shot;
+import android.support.v7.widget.RecyclerView;
+import android.view.View;
 
-import java.util.List;
+import com.baoyz.dribble.util.DimenUtil;
 
-import rx.Observer;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import butterknife.ButterKnife;
 
 /**
- * Created by baoyz on 15/1/10.
+ * Created by baoyz on 15/1/14.
  */
-public class DribbleClient {
+public abstract class BaseAdapter<VH extends BaseAdapter.ViewHolder> extends RecyclerView.Adapter<VH> {
 
-    public static final String END_POINT = "https://api.dribbble.com/v1";
+    private int mLastPosition = -1;
 
-    private DribbleApi mApi;
-
-    public DribbleClient(DribbleApi mApi) {
-        this.mApi = mApi;
+    @Override
+    public void onBindViewHolder(VH holder, int position) {
+        if (position > mLastPosition) {
+            mLastPosition = position;
+            startItemAnimation(holder, position);
+        }
     }
 
-    public Subscription shots(String list, Integer page, Observer<List<Shot>> observer) {
-        return mApi.shots(list, page).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(observer);
+    protected void startItemAnimation(VH holder, int position) {
+        holder.mItemView.setTranslationY(DimenUtil.getScreenWidth(holder.mItemView.getContext()) / 2);
+        holder.mItemView.setAlpha(0);
+        holder.mItemView.animate().translationY(0).alpha(1).setDuration(500).start();
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+
+        public View mItemView;
+
+        public ViewHolder(View itemView) {
+            super(itemView);
+            mItemView = itemView;
+            ButterKnife.inject(this, itemView);
+        }
     }
 }

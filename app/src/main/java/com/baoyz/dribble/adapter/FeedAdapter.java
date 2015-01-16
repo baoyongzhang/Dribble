@@ -21,37 +21,49 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.baoyz.dribble;
+package com.baoyz.dribble.adapter;
 
-import android.support.v7.widget.CardView;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.baoyz.dribble.AppModule;
+import com.baoyz.dribble.R;
 import com.baoyz.dribble.model.Shot;
 import com.baoyz.dribble.widget.CircleImageView;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.ButterKnife;
+import javax.inject.Inject;
+
 import butterknife.InjectView;
 
 /**
  * Created by baoyz on 15/1/13.
  */
-public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
+public class FeedAdapter extends BaseAdapter<FeedAdapter.ViewHolder> {
 
     private List<Shot> mList;
 
+    @Inject
+    Picasso mPicasso;
+
     public FeedAdapter(List<Shot> list) {
         this.mList = list;
+        if (mList == null)
+            mList = new ArrayList<Shot>();
+
+        AppModule.inject(this);
     }
 
-    private int lastIndex = -1;
+    public void addList(List<Shot> list){
+        mList.addAll(list);
+        notifyDataSetChanged();
+    }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -60,24 +72,16 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Picasso picasso = Picasso.with(holder.mIvAvatar.getContext());
+        super.onBindViewHolder(holder, position);
 
         Shot shot = mList.get(position);
-        picasso.load(shot.getUser().getAvatar_url()).into(holder.mIvAvatar);
+        mPicasso.load(shot.getUser().getAvatar_url()).into(holder.mIvAvatar);
         holder.mTvUsername.setText(shot.getUser().getName());
         holder.mTvComment.setText(shot.getComments_count().toString());
         holder.mTvFavorite.setText(shot.getLikes_count().toString());
         holder.mTvViews.setText(shot.getViews_count().toString());
-        picasso.load(shot.getImages().getHidpi()).into(holder.mIvImage);
+        mPicasso.load(shot.getImages().getHidpi()).into(holder.mIvImage);
 
-
-        if (position > lastIndex) {
-            lastIndex = position;
-            // 开启动画
-            holder.cardView.setTranslationY(300);
-            holder.cardView.setRotationX(30);
-            holder.cardView.animate().translationY(0).rotationX(0).setDuration(500).start();
-        }
     }
 
     @Override
@@ -85,10 +89,8 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
         return mList.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends BaseAdapter.ViewHolder {
 
-        @InjectView(R.id.card_view)
-        CardView cardView;
         @InjectView(R.id.iv_avatar)
         CircleImageView mIvAvatar;
         @InjectView(R.id.tv_username)
@@ -104,7 +106,6 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
 
         public ViewHolder(View itemView) {
             super(itemView);
-            ButterKnife.inject(this, itemView);
         }
     }
 }

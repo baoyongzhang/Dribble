@@ -32,13 +32,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 
 import com.baoyz.dribble.AppModule;
-import com.baoyz.dribble.FeedAdapter;
 import com.baoyz.dribble.MainActivity;
 import com.baoyz.dribble.R;
+import com.baoyz.dribble.adapter.FeedAdapter;
 import com.baoyz.dribble.model.Shot;
 import com.baoyz.dribble.network.DribbleClient;
 import com.baoyz.dribble.util.DimenUtil;
-import com.gc.materialdesign.views.ProgressBarCircularIndeterminate;
+import com.baoyz.dribble.util.ToastUtil;
+import com.baoyz.dribble.widget.SuperRecyclerView;
 
 import java.util.List;
 
@@ -46,10 +47,7 @@ import javax.inject.Inject;
 
 import butterknife.InjectView;
 import jp.wasabeef.recyclerview.animators.LandingAnimator;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import rx.Observer;
 
 /**
  * Created by baoyz on 15/1/12.
@@ -57,31 +55,20 @@ import rx.schedulers.Schedulers;
 public class FeedFragment extends BaseFragment {
 
     @InjectView(R.id.rv_feed)
-    RecyclerView mFeedList;
-    @InjectView(R.id.progressBar)
-    ProgressBarCircularIndeterminate mProgressBar;
+    SuperRecyclerView mFeedList;
 
     @Inject
     DribbleClient mClient;
 
     private String mList;
     private MainActivity mActivity;
+    private int mPage;
+    private FeedAdapter mAdapter;
 
     public static FeedFragment newInstance(String list) {
         FeedFragment f = new FeedFragment();
         f.mList = list;
         return f;
-    }
-
-    @Override
-    protected int onGetViewId() {
-        return R.layout.fragment_feed;
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        mActivity = (MainActivity) activity;
     }
 
     @Override
@@ -99,35 +86,47 @@ public class FeedFragment extends BaseFragment {
         mFeedList.setOnScrollListener(new ToolBarScrollListener(mActivity.getToolbar()));
         mFeedList.setItemAnimator(new LandingAnimator());
 
-        Observable<List<Shot>> o = mClient.shots(mList, 1);
-        o.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<List<Shot>>() {
+        mAdapter = new FeedAdapter(null);
+        mFeedList.setAdapter(mAdapter);
+
+        mFeedList.setOnLoadMoreListener(new SuperRecyclerView.OnLoadMoreListener() {
+            @Override
+            public void onLoadMore(RecyclerView recyclerView) {
+                loadData(mPage + 1);
+            }
+        });
+
+    }
+
+    @Override
+    protected int onGetViewId() {
+        return R.layout.fragment_feed;
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        mActivity = (MainActivity) activity;
+    }
+
+    private void loadData(int page) {
+        mPage = page;
+        mClient.shots(mList, mPage, new Observer<List<Shot>>() {
             @Override
             public void onCompleted() {
-                mProgressBar.setVisibility(View.GONE);
+                mFeedList.setLoadMore(false);
             }
 
             @Override
             public void onError(Throwable throwable) {
-//                throwable.printStackTrace();
+                ToastUtil.showShort(mContext, "error : " + throwable.getMessage());
             }
 
             @Override
             public void onNext(List<Shot> shots) {
-                mFeedList.setAdapter(new FeedAdapter(shots));
+                mAdapter.addList(shots);
             }
         });
-//        mClient.shots(mList, 1, new Callback<List<Shot>>() {
-//            @Override
-//            public void success(List<Shot> shots, Response response) {
-//                mFeedList.setAdapter(new FeedAdapter(shots));
-//                mProgressBar.setVisibility(View.GONE);
-//            }
-//
-//            @Override
-//            public void failure(RetrofitError error) {
-//                error.printStackTrace();
-//            }
-//        });
     }
 
     static class ToolBarScrollListener extends RecyclerView.OnScrollListener {
