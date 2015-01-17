@@ -25,19 +25,27 @@ package com.baoyz.dribble.network;
 
 import com.baoyz.dribble.model.Shot;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import javax.inject.Singleton;
 
 import rx.Observer;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
+import rx.subjects.PublishSubject;
+import timber.log.Timber;
 
 /**
  * Created by baoyz on 15/1/10.
  */
+@Singleton
 public class DribbleClient {
 
-    public static final String END_POINT = "https://api.dribbble.com/v1";
+    private Map<Section, List<Shot>> mShotCache = new HashMap<Section, List<Shot>>();
+    private Map<Section, PublishSubject<List<Shot>>> mShotRequestCache = new HashMap<Section, PublishSubject<List<Shot>>>();
 
     private DribbleApi mApi;
 
@@ -46,6 +54,84 @@ public class DribbleClient {
     }
 
     public Subscription shots(String list, Integer page, Observer<List<Shot>> observer) {
-        return mApi.shots(list, page).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(observer);
+
+        final Section section = new Section(list, page);
+
+        Timber.e(mShotCache.toString());
+
+        List<Shot> shots = mShotCache.get(section);
+        if (shots != null)
+            observer.onNext(shots);
+
+        PublishSubject<List<Shot>> request = mShotRequestCache.get(section);
+        if (request != null) {
+            return request.subscribe(observer);
+        }
+
+        request = PublishSubject.create();
+        mShotRequestCache.put(section, request);
+        request.subscribe(observer);
+        request.subscribe(new Observer<List<Shot>>() {
+            @Override
+            public void onCompleted() {
+                mShotRequestCache.remove(section);
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(List<Shot> shots) {
+                Timber.e(".........onNext " + shots.toString());
+                mShotCache.put(section, shots);
+                Timber.e(mShotCache.toString());
+            }
+        });
+
+        return mApi.shots(list, page)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(request);
+    }
+
+    static class Section {
+
+        String list;
+        Integer page;
+
+        Section(String list, Integer page) {
+            this.list = list;
+            this.page = page;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            Section section = (Section) o;
+
+            if (list != null ? !list.equals(section.list) : section.list != null) return false;
+            if (page != null ? !page.equals(section.page) : section.page != null) return false;
+
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = list != null ? list.hashCode() : 0;
+            result = 31 * result + (page != null ? page.hashCode() : 0);
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return "Section{" +
+                    "list='" + list + '\'' +
+                    ", page=" + page +
+                    '}';
+        }
     }
 }

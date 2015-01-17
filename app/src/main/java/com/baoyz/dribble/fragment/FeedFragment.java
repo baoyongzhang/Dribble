@@ -96,6 +96,7 @@ public class FeedFragment extends BaseFragment {
             }
         });
 
+        loadData(1);
     }
 
     @Override

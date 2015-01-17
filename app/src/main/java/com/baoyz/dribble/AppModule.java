@@ -59,6 +59,7 @@ import timber.log.Timber;
 public class AppModule {
 
     static final int DISK_CACHE_SIZE = 50 * 1024 * 1024; // 50MB
+    private static ObjectGraph objectGraph;
 
     @Provides
     @Singleton
@@ -89,14 +90,21 @@ public class AppModule {
 
     @Provides
     @Singleton
-    public DribbleClient provideDribbleClient(RestAdapter adapter) {
-        return new DribbleClient(adapter.create(DribbleApi.class));
+    public DribbleClient provideDribbleClient(DribbleApi api) {
+        Timber.e(".......................provideDribbleClient");
+        return new DribbleClient(api);
+    }
+
+    @Provides
+    @Singleton
+    public DribbleApi provideDribbleApi(RestAdapter adapter) {
+        return adapter.create(DribbleApi.class);
     }
 
     @Provides
     @Singleton
     public RestAdapter provideRestAdapter() {
-        return new RestAdapter.Builder().setEndpoint(DribbleClient.END_POINT)
+        return new RestAdapter.Builder().setEndpoint("https://api.dribbble.com/v1")
                 .setLogLevel(RestAdapter.LogLevel.FULL)
                 .setLog(new RestAdapter.Log() {
                     @Override
@@ -112,7 +120,9 @@ public class AppModule {
     }
 
     public static void inject(Object target) {
-        ObjectGraph.create(AppModule.class).inject(target);
+        if (objectGraph == null)
+            objectGraph = ObjectGraph.create(new AppModule());
+        objectGraph.inject(target);
     }
 
     static OkHttpClient createOkHttpClient(Application app) {
