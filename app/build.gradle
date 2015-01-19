@@ -10,6 +10,8 @@ android {
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"
+        renderscriptTargetApi 19
+        renderscriptSupportModeEnabled true
     }
     buildTypes {
         release {
@@ -41,4 +43,8 @@ dependencies {
     compile 'com.github.navasmdc:MaterialDesign:1.+@aar'
     compile 'com.netflix.rxjava:rxjava-android:0.20.7'
     compile 'jp.wasabeef:recyclerview-animators:1.0.1'
+    compile 'com.nineoldandroids:library:2.4.0'
+    compile 'com.daimajia.easing:library:1.0.0@aar'
+    compile 'com.daimajia.androidanimations:library:1.1.2@aar'
+    compile 'com.daimajia.androidviewhover:library:1.0.3@aar'
 }

@@ -23,6 +23,7 @@
  */
 package com.baoyz.dribble.adapter;
 
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +34,7 @@ import com.baoyz.dribble.AppModule;
 import com.baoyz.dribble.R;
 import com.baoyz.dribble.model.Shot;
 import com.baoyz.dribble.widget.CircleImageView;
+import com.baoyz.dribble.widget.SwipeHoverLayout;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -60,7 +62,7 @@ public class FeedAdapter extends BaseAdapter<FeedAdapter.ViewHolder> {
         AppModule.inject(this);
     }
 
-    public void addList(List<Shot> list){
+    public void addList(List<Shot> list) {
         mList.addAll(list);
         notifyDataSetChanged();
     }
@@ -81,7 +83,8 @@ public class FeedAdapter extends BaseAdapter<FeedAdapter.ViewHolder> {
         holder.mTvFavorite.setText(shot.getLikes_count().toString());
         holder.mTvViews.setText(shot.getViews_count().toString());
         mPicasso.load(shot.getImages().getHidpi()).into(holder.mIvImage);
-
+        holder.mTvDescription.setText(Html.fromHtml(shot.getDescription()));
+        holder.mHoverLayout.destroyHover();
     }
 
     @Override
@@ -103,6 +106,10 @@ public class FeedAdapter extends BaseAdapter<FeedAdapter.ViewHolder> {
         TextView mTvComment;
         @InjectView(R.id.tv_favorite)
         TextView mTvFavorite;
+        @InjectView(R.id.tv_description)
+        TextView mTvDescription;
+        @InjectView(R.id.hoverLayout)
+        SwipeHoverLayout mHoverLayout;
 
         public ViewHolder(View itemView) {
             super(itemView);

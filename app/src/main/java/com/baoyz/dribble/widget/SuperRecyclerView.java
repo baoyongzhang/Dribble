@@ -24,11 +24,14 @@
 package com.baoyz.dribble.widget;
 
 import android.content.Context;
+import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 
 import com.baoyz.dribble.R;
@@ -42,6 +45,9 @@ public class SuperRecyclerView extends RecyclerView {
     private boolean isLoading;
     private WrapperAdapter mAdapter;
     private OnLoadMoreListener mOnLoadMoreListener;
+    private float mDownX;
+    private boolean mInterceptTouch;
+    private int mTouchDistance;
 
     public SuperRecyclerView(Context context) {
         this(context, null);
@@ -75,6 +81,32 @@ public class SuperRecyclerView extends RecyclerView {
                     mScrollListener.onScrolled(recyclerView, dx, dy);
             }
         });
+
+        mTouchDistance = ViewConfiguration.get(context).getScaledOverflingDistance();
+    }
+
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent e) {
+
+        boolean b = super.onInterceptTouchEvent(e);
+
+        int actionMasked = MotionEventCompat.getActionMasked(e);
+        switch (actionMasked) {
+            case MotionEvent.ACTION_DOWN:
+                mDownX = e.getX();
+                mInterceptTouch = false;
+                break;
+            case MotionEvent.ACTION_MOVE:
+                float offsetY = e.getX() - mDownX;
+                if (!b && Math.abs(offsetY) > mTouchDistance)
+                    mInterceptTouch = true;
+                break;
+        }
+
+        if (mInterceptTouch)
+            return false;
+
+        return b;
     }
 
     public void setLoadMore(boolean load) {
@@ -87,7 +119,7 @@ public class SuperRecyclerView extends RecyclerView {
         mAdapter.notifyDataSetChanged();
     }
 
-    public void setOnLoadMoreListener (OnLoadMoreListener listener) {
+    public void setOnLoadMoreListener(OnLoadMoreListener listener) {
         mOnLoadMoreListener = listener;
     }
 

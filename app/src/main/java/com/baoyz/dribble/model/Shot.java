@@ -23,6 +23,8 @@
  */
 package com.baoyz.dribble.model;
 
+import android.text.TextUtils;
+
 import java.util.List;
 
 /**
@@ -61,6 +63,8 @@ public class Shot {
     }
 
     public String getDescription() {
+        if (TextUtils.isEmpty(description))
+            return "";
         return description;
     }
 
