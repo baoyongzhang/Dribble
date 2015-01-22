@@ -1,35 +1,10 @@
-/*
- * The MIT License (MIT)
- * 
- * Copyright (c) 2015 baoyongzhang <baoyz94@gmail.com>
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
 package com.baoyz.dribble.widget;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
@@ -37,17 +12,14 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
-import android.widget.RelativeLayout;
+import android.widget.FrameLayout;
 
 import com.baoyz.dribble.R;
 import com.baoyz.dribble.util.DimenUtil;
 import com.daimajia.androidviewhover.tools.Blur;
 import com.daimajia.androidviewhover.tools.Util;
 
-/**
- * Created by baoyz on 15/1/19.
- */
-public class SwipeHoverLayout extends RelativeLayout {
+public class SwipeLayout extends FrameLayout {
 
     public static final int ANIMATION_DURATION = 500;
 
@@ -71,24 +43,18 @@ public class SwipeHoverLayout extends RelativeLayout {
         public static final int SHOW = ~HIDE;
     }
 
-    public SwipeHoverLayout(Context context) {
+    public SwipeLayout(Context context) {
         super(context);
         init();
     }
 
-    public SwipeHoverLayout(Context context, AttributeSet attrs) {
+    public SwipeLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
     }
 
-    public SwipeHoverLayout(Context context, AttributeSet attrs, int defStyleAttr) {
+    public SwipeLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public SwipeHoverLayout(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
         init();
     }
 
@@ -113,7 +79,7 @@ public class SwipeHoverLayout extends RelativeLayout {
                 int distance = Math.abs((int) (e2.getX() - mDownX));
                 mDistanceShow = distance >= 10;
                 dispatchSwipe(distance);
-                return false;
+                return mDistanceShow;
             }
 
             @Override
@@ -123,6 +89,7 @@ public class SwipeHoverLayout extends RelativeLayout {
                 mDistanceShow = false;
                 return true;
             }
+
         });
     }
 
@@ -164,8 +131,6 @@ public class SwipeHoverLayout extends RelativeLayout {
     }
 
     private void startSmoothAnimation(final int state) {
-        if (mHoverState == state)
-            return;
         ensureHoverView();
         switch (state) {
             case HoverState.HIDE:
@@ -232,25 +197,26 @@ public class SwipeHoverLayout extends RelativeLayout {
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
-        boolean flag = mGestureDetector.onTouchEvent(ev);
-        int actionMasked = MotionEventCompat.getActionMasked(ev);
-        switch (actionMasked) {
-            case MotionEvent.ACTION_CANCEL:
-                startSmoothAnimation(mHoverState);
-                mDistanceShow = false;
-                mFlingShow = false;
-                break;
-            case MotionEvent.ACTION_UP:
-                if (mDistanceShow || mFlingShow) {
-                    startSmoothAnimation(~mHoverState);
-                } else {
-                    startSmoothAnimation(mHoverState);
-                }
-                mDistanceShow = false;
-                mFlingShow = false;
-                break;
-        }
-        return flag;
+//        boolean flag = mGestureDetector.onTouchEvent(ev);
+//        int actionMasked = MotionEventCompat.getActionMasked(ev);
+//        switch (actionMasked) {
+//            case MotionEvent.ACTION_CANCEL:
+//                startSmoothAnimation(mHoverState);
+//                mDistanceShow = false;
+//                mFlingShow = false;
+//                break;
+//            case MotionEvent.ACTION_UP:
+//                if (mDistanceShow || mFlingShow) {
+//                    startSmoothAnimation(~mHoverState);
+//                } else {
+//                    startSmoothAnimation(mHoverState);
+//                }
+//                mDistanceShow = false;
+//                mFlingShow = false;
+//                break;
+//        }
+//        return flag;
+        return true;
     }
 
     public View getHoverView() {
@@ -263,4 +229,17 @@ public class SwipeHoverLayout extends RelativeLayout {
             getHoverView().setVisibility(View.GONE);
         }
     }
+
+//    @Override
+//    public boolean onInterceptTouchEvent(MotionEvent ev) {
+//        return true;
+//    }
+//
+//
+//    @Override
+//    public boolean onTouchEvent(MotionEvent event) {
+//        return true;
+//    }
+
+
 }

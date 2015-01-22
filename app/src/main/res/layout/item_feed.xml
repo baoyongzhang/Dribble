@@ -63,11 +63,11 @@
                     android:id="@+id/tv_description"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:maxHeight="280dp"
                     android:layout_gravity="center_vertical"
                     android:background="#66000000"
-                    android:padding="10dp"
                     android:ellipsize="end"
+                    android:maxHeight="280dp"
+                    android:padding="10dp"
                     android:textColor="#FFFFFF" />
             </FrameLayout>
 
@@ -106,7 +106,6 @@
                 android:text="5000"
                 android:textColor="@color/material_blue_grey_800" />
         </LinearLayout>
-
     </LinearLayout>
 
 </android.support.v7.widget.CardView>

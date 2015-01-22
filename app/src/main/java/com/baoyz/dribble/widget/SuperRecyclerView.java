@@ -36,6 +36,8 @@ import android.view.ViewGroup;
 
 import com.baoyz.dribble.R;
 
+import timber.log.Timber;
+
 /**
  * Created by baoyz on 15/1/16.
  */
@@ -48,6 +50,7 @@ public class SuperRecyclerView extends RecyclerView {
     private float mDownX;
     private boolean mInterceptTouch;
     private int mTouchDistance;
+    private float mDownY;
 
     public SuperRecyclerView(Context context) {
         this(context, null);
@@ -90,15 +93,18 @@ public class SuperRecyclerView extends RecyclerView {
 
         boolean b = super.onInterceptTouchEvent(e);
 
+        Timber.e("onInterceptTouchEvent " + b);
+
         int actionMasked = MotionEventCompat.getActionMasked(e);
         switch (actionMasked) {
             case MotionEvent.ACTION_DOWN:
                 mDownX = e.getX();
+                mDownY = e.getY();
                 mInterceptTouch = false;
                 break;
             case MotionEvent.ACTION_MOVE:
-                float offsetY = e.getX() - mDownX;
-                if (!b && Math.abs(offsetY) > mTouchDistance)
+                float offsetX = e.getX() - mDownX;
+                if (!b && Math.abs(offsetX) > mTouchDistance)
                     mInterceptTouch = true;
                 break;
         }
@@ -107,6 +113,12 @@ public class SuperRecyclerView extends RecyclerView {
             return false;
 
         return b;
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent e) {
+        Timber.e("onTouchEvent ");
+        return super.onTouchEvent(e);
     }
 
     public void setLoadMore(boolean load) {
