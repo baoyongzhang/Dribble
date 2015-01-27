@@ -67,7 +67,6 @@ public class FeedFragment extends BaseFragment {
     private FeedAdapter mAdapter;
     private Toolbar mToolBar;
     private ViewGroup mContainer;
-    private int mHeight;
     private int mTop;
 
     public static FeedFragment newInstance(String list) {
@@ -102,10 +101,10 @@ public class FeedFragment extends BaseFragment {
                 loadData(mPage + 1);
             }
         });
+        mToolBar.setTranslationY(0);
         mFeedList.post(new Runnable() {
             @Override
             public void run() {
-                mHeight = mFeedList.getHeight();
                 mTop = mToolBar.getHeight();
                 mFeedList.setTranslationY(mTop);
             }
