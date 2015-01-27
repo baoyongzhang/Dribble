@@ -34,7 +34,6 @@ import com.baoyz.dribble.AppModule;
 import com.baoyz.dribble.DetailActivity;
 import com.baoyz.dribble.R;
 import com.baoyz.dribble.model.Shot;
-import com.baoyz.dribble.widget.CircleImageView;
 import com.baoyz.dribble.widget.SwipeHoverLayout;
 import com.squareup.picasso.Picasso;
 
@@ -98,7 +97,7 @@ public class FeedAdapter extends BaseAdapter<FeedAdapter.ViewHolder> {
     public static class ViewHolder extends BaseAdapter.ViewHolder {
 
         @InjectView(R.id.iv_avatar)
-        CircleImageView mIvAvatar;
+        ImageView mIvAvatar;
         @InjectView(R.id.tv_username)
         TextView mTvUsername;
         @InjectView(R.id.iv_image)
