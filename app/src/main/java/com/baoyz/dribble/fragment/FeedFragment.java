@@ -23,6 +23,7 @@
  */
 package com.baoyz.dribble.fragment;
 
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -30,6 +31,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.baoyz.dribble.AppModule;
 import com.baoyz.dribble.MainActivity;
@@ -37,7 +39,6 @@ import com.baoyz.dribble.R;
 import com.baoyz.dribble.adapter.FeedAdapter;
 import com.baoyz.dribble.model.Shot;
 import com.baoyz.dribble.network.DribbleClient;
-import com.baoyz.dribble.util.DimenUtil;
 import com.baoyz.dribble.util.ToastUtil;
 import com.baoyz.dribble.widget.SuperRecyclerView;
 
@@ -64,6 +65,10 @@ public class FeedFragment extends BaseFragment {
     private MainActivity mActivity;
     private int mPage;
     private FeedAdapter mAdapter;
+    private Toolbar mToolBar;
+    private ViewGroup mContainer;
+    private int mHeight;
+    private int mTop;
 
     public static FeedFragment newInstance(String list) {
         FeedFragment f = new FeedFragment();
@@ -75,6 +80,9 @@ public class FeedFragment extends BaseFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         AppModule.inject(this);
 
+        mToolBar = mActivity.getToolbar();
+        mContainer = (ViewGroup) view.getParent();
+
         LinearLayoutManager layoutManager = new LinearLayoutManager(mContext) {
             @Override
             protected int getExtraLayoutSpace(RecyclerView.State state) {
@@ -83,7 +91,6 @@ public class FeedFragment extends BaseFragment {
         };
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mFeedList.setLayoutManager(layoutManager);
-        mFeedList.setOnScrollListener(new ToolBarScrollListener(mActivity.getToolbar()));
         mFeedList.setItemAnimator(new LandingAnimator());
 
         mAdapter = new FeedAdapter(null);
@@ -95,8 +102,46 @@ public class FeedFragment extends BaseFragment {
                 loadData(mPage + 1);
             }
         });
+        mFeedList.post(new Runnable() {
+            @Override
+            public void run() {
+                mHeight = mFeedList.getHeight();
+                mTop = mToolBar.getHeight();
+                mFeedList.setTranslationY(mTop);
+            }
+        });
+        mFeedList.setOnQuickScrollListener(new SuperRecyclerView.OnQuickScrollListener() {
+            @Override
+            public void onQuickUp() {
+                if (mFeedList.getTranslationY() == mTop) {
+                    start(mTop, 0);
+                }
+            }
+
+            private void start(int start, int end){
+
+                ValueAnimator valueAnimator = ValueAnimator.ofInt(start, end).setDuration(200);
+                valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animation) {
+                        int animatedValue = (int) animation.getAnimatedValue();
+                        mToolBar.setTranslationY(animatedValue - mTop);
+                        mFeedList.setTranslationY(animatedValue);
+                    }
+                });
+                valueAnimator.start();
+            }
+
+            @Override
+            public void onQuickDown() {
+                if (mFeedList.getTranslationY() == 0) {
+                    start(0, mTop);
+                }
+            }
+        });
 
         loadData(1);
+
     }
 
     @Override
@@ -130,44 +175,4 @@ public class FeedFragment extends BaseFragment {
         });
     }
 
-    static class ToolBarScrollListener extends RecyclerView.OnScrollListener {
-
-        private Toolbar toolbar;
-        private int distance;
-        private int maxDis;
-
-        ToolBarScrollListener(Toolbar toolbar) {
-            this.toolbar = toolbar;
-            maxDis = DimenUtil.dp2px(toolbar.getContext(), 20);
-        }
-
-        @Override
-        public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-            super.onScrollStateChanged(recyclerView, newState);
-//            if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-//                if (distance > maxDis && toolbar.getVisibility() == View.VISIBLE) {
-//                    toolbar.animate().translationYBy(-toolbar.getHeight()).alpha(0).setDuration(200).setListener(new AnimatorListenerAdapter() {
-//                        @Override
-//                        public void onAnimationEnd(Animator animation) {
-//                            toolbar.setVisibility(View.GONE);
-//                        }
-//                    }).start();
-//                } else if (-distance > maxDis && toolbar.getVisibility() == View.GONE) {
-//                    toolbar.setVisibility(View.VISIBLE);
-//                    toolbar.animate().translationYBy(toolbar.getHeight()).alpha(1).setDuration(200).start();
-//                }
-//                distance = 0;
-//            }
-        }
-
-        @Override
-        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-            distance += dy;
-//            if (dy > 0) {
-//                toolbar.setVisibility(View.GONE);
-//            } else {
-//                toolbar.setVisibility(View.VISIBLE);
-//            }
-        }
-    }
 }

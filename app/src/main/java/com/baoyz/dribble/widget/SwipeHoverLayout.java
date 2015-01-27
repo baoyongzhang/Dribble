@@ -216,15 +216,11 @@ public class SwipeHoverLayout extends RelativeLayout {
         switch (actionMasked) {
             case MotionEvent.ACTION_DOWN:
                 mDownX = (int) ev.getX();
-                flag = true;
+                mGestureDetector.onTouchEvent(ev);
                 break;
             case MotionEvent.ACTION_MOVE:
                 if (Math.abs(ev.getX() - mDownX) > mTouchSlop)
                     flag = true;
-                break;
-            case MotionEvent.ACTION_UP:
-            case MotionEvent.ACTION_CANCEL:
-                flag = true;
                 break;
         }
         return flag;

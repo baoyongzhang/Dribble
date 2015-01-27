@@ -31,6 +31,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.baoyz.dribble.AppModule;
+import com.baoyz.dribble.DetailActivity;
 import com.baoyz.dribble.R;
 import com.baoyz.dribble.model.Shot;
 import com.baoyz.dribble.widget.CircleImageView;
@@ -43,6 +44,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import butterknife.InjectView;
+import butterknife.OnClick;
 
 /**
  * Created by baoyz on 15/1/13.
@@ -85,6 +87,7 @@ public class FeedAdapter extends BaseAdapter<FeedAdapter.ViewHolder> {
         mPicasso.load(shot.getImages().getHidpi()).into(holder.mIvImage);
         holder.mTvDescription.setText(Html.fromHtml(shot.getDescription()));
         holder.mHoverLayout.destroyHover();
+        holder.mIvImage.setTag(shot);
     }
 
     @Override
@@ -113,6 +116,11 @@ public class FeedAdapter extends BaseAdapter<FeedAdapter.ViewHolder> {
 
         public ViewHolder(View itemView) {
             super(itemView);
+        }
+
+        @OnClick(R.id.iv_image)
+        public void onClick(View view) {
+            DetailActivity.start(view.getContext(), (Shot) view.getTag());
         }
     }
 }

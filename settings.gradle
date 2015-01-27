@@ -1,1 +1,1 @@
-include ':app', ':drawer'
+include ':app', ':drawer', ':apt'

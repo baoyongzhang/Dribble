@@ -1,14 +1,8 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.baoyz.dribble.widget.SuperRecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rv_feed"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.baoyz.dribble.fragment.FeedFragment">
 
-    <com.baoyz.dribble.widget.SuperRecyclerView
-        android:id="@+id/rv_feed"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-
-    </com.baoyz.dribble.widget.SuperRecyclerView>
-
-</FrameLayout>
+</com.baoyz.dribble.widget.SuperRecyclerView>

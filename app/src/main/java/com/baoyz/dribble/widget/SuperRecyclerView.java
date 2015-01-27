@@ -24,10 +24,12 @@
 package com.baoyz.dribble.widget;
 
 import android.content.Context;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -35,8 +37,6 @@ import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 
 import com.baoyz.dribble.R;
-
-import timber.log.Timber;
 
 /**
  * Created by baoyz on 15/1/16.
@@ -51,6 +51,9 @@ public class SuperRecyclerView extends RecyclerView {
     private boolean mInterceptTouch;
     private int mTouchDistance;
     private float mDownY;
+    private OnQuickScrollListener mOnQuickScrollListener;
+    private GestureDetectorCompat mGesutureDetector;
+    private int mFlingVelocity;
 
     public SuperRecyclerView(Context context) {
         this(context, null);
@@ -85,15 +88,28 @@ public class SuperRecyclerView extends RecyclerView {
             }
         });
 
-        mTouchDistance = ViewConfiguration.get(context).getScaledOverflingDistance();
+        ViewConfiguration viewConfiguration = ViewConfiguration.get(context);
+        mTouchDistance = viewConfiguration.getScaledOverflingDistance();
+        mFlingVelocity = viewConfiguration.getScaledMinimumFlingVelocity();
+
+        mGesutureDetector = new GestureDetectorCompat(context, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+                if (mOnQuickScrollListener != null && Math.abs(velocityY) > mFlingVelocity) {
+                    if (velocityY > 0)
+                        mOnQuickScrollListener.onQuickDown();
+                    else
+                        mOnQuickScrollListener.onQuickUp();
+                }
+                return super.onFling(e1, e2, velocityX, velocityY);
+            }
+        });
     }
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent e) {
 
         boolean b = super.onInterceptTouchEvent(e);
-
-        Timber.e("onInterceptTouchEvent " + b);
 
         int actionMasked = MotionEventCompat.getActionMasked(e);
         switch (actionMasked) {
@@ -117,7 +133,7 @@ public class SuperRecyclerView extends RecyclerView {
 
     @Override
     public boolean onTouchEvent(MotionEvent e) {
-        Timber.e("onTouchEvent ");
+        mGesutureDetector.onTouchEvent(e);
         return super.onTouchEvent(e);
     }
 
@@ -133,6 +149,10 @@ public class SuperRecyclerView extends RecyclerView {
 
     public void setOnLoadMoreListener(OnLoadMoreListener listener) {
         mOnLoadMoreListener = listener;
+    }
+
+    public void setOnQuickScrollListener(OnQuickScrollListener listener) {
+        mOnQuickScrollListener = listener;
     }
 
     @Override
@@ -254,5 +274,11 @@ public class SuperRecyclerView extends RecyclerView {
 
     public static interface OnLoadMoreListener {
         public void onLoadMore(RecyclerView recyclerView);
+    }
+
+    public static interface OnQuickScrollListener {
+        public void onQuickUp();
+
+        public void onQuickDown();
     }
 }
