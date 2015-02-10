@@ -54,6 +54,7 @@ import timber.log.Timber;
         injects = {
                 FeedFragment.class,
                 FeedAdapter.class,
+                DetailActivity.class,
         }
 )
 public class AppModule {
@@ -91,7 +92,6 @@ public class AppModule {
     @Provides
     @Singleton
     public DribbleClient provideDribbleClient(DribbleApi api) {
-        Timber.e(".......................provideDribbleClient");
         return new DribbleClient(api);
     }
 

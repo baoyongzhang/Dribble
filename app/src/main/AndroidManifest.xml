@@ -23,6 +23,10 @@
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" >
         </activity>
+        <activity
+            android:name=".DetailActivity"
+            android:theme="@style/AppTheme.TransparentActivity">
+        </activity>
     </application>
 
 </manifest>

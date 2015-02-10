@@ -129,6 +129,7 @@ public abstract class MaterialNavigationDrawer<Fragment> extends ActionBarActivi
             }
         }
     };
+
     private View.OnClickListener secondAccountListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -150,6 +151,7 @@ public abstract class MaterialNavigationDrawer<Fragment> extends ActionBarActivi
 
         }
     };
+
     private View.OnClickListener thirdAccountListener = new View.OnClickListener() {
 
         @Override

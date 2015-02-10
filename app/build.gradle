@@ -48,4 +48,6 @@ dependencies {
     compile 'com.daimajia.androidanimations:library:1.1.2@aar'
     compile 'com.daimajia.androidviewhover:library:1.0.3@aar'
     compile 'de.hdodenhof:circleimageview:1.2.1'
+    compile 'com.android.support:palette-v7:21.0.3'
+    compile 'pl.droidsonroids.gif:android-gif-drawable:1.1.+'
 }

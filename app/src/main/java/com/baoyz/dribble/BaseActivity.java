@@ -41,7 +41,7 @@ import butterknife.ButterKnife;
 public class BaseActivity extends ActionBarActivity {
 
     private Handler mHandler = new Handler();
-    protected BaseActivity mContext;
+    public BaseActivity mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

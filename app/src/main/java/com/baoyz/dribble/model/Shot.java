@@ -23,14 +23,17 @@
  */
 package com.baoyz.dribble.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.text.TextUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by baoyz on 15/1/11.
  */
-public class Shot {
+public class Shot implements Parcelable {
 
     private String id;
     private String title;
@@ -152,7 +155,9 @@ public class Shot {
         this.user = user;
     }
 
-    public static class Images {
+
+
+    public static class Images implements Parcelable {
 
         private String hidpi;
         private String normal;
@@ -181,5 +186,89 @@ public class Shot {
         public void setTeaser(String teaser) {
             this.teaser = teaser;
         }
+
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeString(this.hidpi);
+            dest.writeString(this.normal);
+            dest.writeString(this.teaser);
+        }
+
+        public Images() {
+        }
+
+        private Images(Parcel in) {
+            this.hidpi = in.readString();
+            this.normal = in.readString();
+            this.teaser = in.readString();
+        }
+
+        public static final Parcelable.Creator<Images> CREATOR = new Parcelable.Creator<Images>() {
+            public Images createFromParcel(Parcel source) {
+                return new Images(source);
+            }
+
+            public Images[] newArray(int size) {
+                return new Images[size];
+            }
+        };
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.id);
+        dest.writeString(this.title);
+        dest.writeString(this.description);
+        dest.writeValue(this.width);
+        dest.writeValue(this.height);
+        dest.writeParcelable(this.images, 0);
+        dest.writeValue(this.views_count);
+        dest.writeValue(this.likes_count);
+        dest.writeValue(this.comments_count);
+        dest.writeString(this.created_at);
+        dest.writeString(this.updated_at);
+        dest.writeList(this.tags);
+        dest.writeParcelable(this.user, flags);
+    }
+
+    public Shot() {
+    }
+
+    private Shot(Parcel in) {
+        this.id = in.readString();
+        this.title = in.readString();
+        this.description = in.readString();
+        this.width = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.height = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.images = in.readParcelable(Images.class.getClassLoader());
+        this.views_count = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.likes_count = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.comments_count = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.created_at = in.readString();
+        this.updated_at = in.readString();
+        this.tags = new ArrayList<String>();
+        in.readList(this.tags, List.class.getClassLoader());
+        this.user = in.readParcelable(User.class.getClassLoader());
+    }
+
+    public static final Parcelable.Creator<Shot> CREATOR = new Parcelable.Creator<Shot>() {
+        public Shot createFromParcel(Parcel source) {
+            return new Shot(source);
+        }
+
+        public Shot[] newArray(int size) {
+            return new Shot[size];
+        }
+    };
 }

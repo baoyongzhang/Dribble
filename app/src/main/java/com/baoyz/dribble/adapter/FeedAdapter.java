@@ -119,7 +119,7 @@ public class FeedAdapter extends BaseAdapter<FeedAdapter.ViewHolder> {
 
         @OnClick(R.id.iv_image)
         public void onClick(View view) {
-            DetailActivity.start(view.getContext(), (Shot) view.getTag());
+            DetailActivity.start((android.app.Activity) view.getContext(), (Shot) view.getTag(), view);
         }
     }
 }

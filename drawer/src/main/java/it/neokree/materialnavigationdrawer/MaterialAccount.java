@@ -2,12 +2,7 @@ package it.neokree.materialnavigationdrawer;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.graphics.Point;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
@@ -20,7 +15,6 @@ import it.neokree.materialnavigationdrawer.util.Utils;
 public class MaterialAccount {
 
     // datas
-
     private Drawable photo;
     private Drawable background;
     private Drawable circularPhoto;

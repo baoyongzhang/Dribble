@@ -45,4 +45,7 @@ public interface DribbleApi {
 
     @GET("/shots/{id}/attachments")
     public void attachments(@Path("id") String shotId, Callback callback);
+
+    @GET("/shots/{shot}/comments")
+    public void comments(@Path("shot") String shotId, Callback callback);
 }

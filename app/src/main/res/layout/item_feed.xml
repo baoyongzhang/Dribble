@@ -51,7 +51,7 @@
             <ImageView
                 android:id="@+id/iv_image"
                 android:layout_width="match_parent"
-                android:layout_height="280dp"
+                android:layout_height="220dp"
                 android:scaleType="centerCrop" />
 
             <FrameLayout
